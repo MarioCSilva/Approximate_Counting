@@ -3,6 +3,7 @@ import re
 from utils import open_file
 from random import random, seed
 
+
 class DecreasingProbCounter():
     def __init__(self, fname="datasets/it_book.txt"):
         seed(93430)
@@ -15,8 +16,6 @@ class DecreasingProbCounter():
         # gets the dictionary with the number of occurrences of each letter
         # using a decreased probability as 1 / 2 ** k
         self.count(fname)
-
-        print(self.letter_occur)
 
 
     def count(self, fname):

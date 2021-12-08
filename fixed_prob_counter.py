@@ -3,6 +3,7 @@ import re
 from utils import open_file
 from random import random, seed
 
+
 class FixedProbCounter():
     def __init__(self, fname="datasets/it_book.txt"):
         seed(93430)
@@ -16,8 +17,6 @@ class FixedProbCounter():
         # gets the dictionary with the number of occurrences of each letter
         # using a fixed probability of 1 / 8
         self.count(fname)
-
-        print(self.letter_occur)
 
 
     def count(self, fname):
