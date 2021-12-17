@@ -51,7 +51,7 @@ class Test():
 
         avg_time = total_time / self.rep
 
-        print(f"\t{'Average ' if self.k != 1 else ''}Counting Time: {avg_time:.2f} seconds")
+        print(f"\t{'Average ' if self.rep != 1 else ''}Counting Time: {avg_time:.2f} seconds")
 
         if not exact:
             avg_events = total_events / self.rep
