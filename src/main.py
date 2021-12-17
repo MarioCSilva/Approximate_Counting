@@ -1,24 +1,20 @@
 import sys
 import logging
 import argparse
-from exact_counter import ExactCounter
-from fixed_prob_counter import FixedProbCounter
-from decr_prob_counter import DecreasingProbCounter
+from tests import Test
 
 
 class Main:
     def __init__(self):
-        fname = self.check_arguments()
-        self.exact_counter = ExactCounter(fname)
-        self.fixed_counter = FixedProbCounter(fname)
-        self.decreasing_counter = DecreasingProbCounter(fname)
-
-        self.handle_results()
+        Test(*self.check_arguments())
 
 
     def usage(self):
         print("Usage: python3 main.py\
-            \n\t-f <File Name for Counting Letters: str>")
+            \n\t-f <File Name for Counting Letters: str>\
+            \n\t-k <Top k Most Occurrent Letters: int>\
+            \n\t-r <Repetitions for Testing: int>")
+
         sys.exit()
 
 
@@ -28,7 +24,9 @@ class Main:
             usage=self.usage
         )
         arg_parser.add_argument('-help', action='store_true')
-        arg_parser.add_argument('-file_name', nargs=1, type=str, default=['datasets/it_book.txt'])
+        arg_parser.add_argument('-file_name', nargs=1, type=str, default=['../datasets/it_book.txt'])
+        arg_parser.add_argument('-repetitions', nargs=1, type=int, default=[100])
+        arg_parser.add_argument('-k', nargs=1, type=int, default=[10])
 
         try:
             args = arg_parser.parse_args()
@@ -38,13 +36,7 @@ class Main:
         if args.help:
             self.usage()
 
-        return args.file_name[0]
-    
-
-    def handle_results(self):
-        logging.info(self.exact_counter.letter_occur)
-        logging.info(self.fixed_counter.letter_occur)
-        logging.info(self.decreasing_counter.letter_occur)
+        return args.file_name[0], args.repetitions[0], args.k[0]
 
 
 if __name__ == "__main__":

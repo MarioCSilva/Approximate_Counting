@@ -5,22 +5,28 @@ from random import random, seed
 
 
 class FixedProbCounter():
-    def __init__(self, fname="datasets/it_book.txt"):
+    def __init__(self, fname="../datasets/it_book.txt"):
         seed(93430)
 
-        # dictionary with the number of occurrences of each letter
-        self.letter_occur = defaultdict(int)
+        self.fname = fname
+
         self.fixed_probability = 1 / 8
 
-        # reads file in chunks
-        # counts the letters and stores the event
-        # gets the dictionary with the number of occurrences of each letter
-        # using a fixed probability of 1 / 8
-        self.count(fname)
+    
+    def __str__(self):
+        return "Fixed Probability Counter with 1 / 8"
 
 
-    def count(self, fname):
-        file = open_file(fname, 'r')
+    '''Reads file in chunks
+       counts the letters and stores the event
+       gets the dictionary with the number of occurrences of each letter
+       using a fixed probability of 1 / 8
+    '''
+    def count(self):
+        self.letter_occur = defaultdict(int)
+        self.counter_value = 0
+
+        file = open_file(self.fname, 'r')
 
         # reads chunk by chunk
         while chunk := file.read(1024):
@@ -29,7 +35,14 @@ class FixedProbCounter():
                 # counts event with a fixed probability
                 if random() <= self.fixed_probability:
                     self.letter_occur[letter] += 1
+                    self.counter_value += 1
 
         file.close
 
-FixedProbCounter()
+
+    def estimated_events(self, num=0):
+        if not num:
+            num = self.counter_value
+        return int(num * (1 / self.fixed_probability))
+    
+
