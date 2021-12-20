@@ -25,7 +25,6 @@ class DecreasingProbCounter():
     def count(self):
         self.letter_occur = defaultdict(int)
         self.counter_value = 0
-        decreasing_probability = 1 / self.a ** self.counter_value
 
         file = open_file(self.fname, 'r')
 
@@ -34,14 +33,13 @@ class DecreasingProbCounter():
             # removes all non-alphabetical chars
             for letter in re.findall(r'[A-Z]', chunk):
                 # counts event with a decreasing probability
-                if random() <= decreasing_probability:
+                if random() <= 1 / self.a ** self.letter_occur[letter]:
                     self.letter_occur[letter] += 1
                     self.counter_value += 1
-                    decreasing_probability = 1 / self.a ** self.counter_value
 
 
     def estimated_events(self, num=0):
         if not num:
             num = self.counter_value
-        return int(self.a ** num - self.a + 1) / ( self.a - 1 )
+        return int(self.a ** num - 1)
 
