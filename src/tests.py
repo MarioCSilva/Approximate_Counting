@@ -26,8 +26,8 @@ class Test():
         return {k: dict1.get(k, 0) + dict2.get(k, 0) for k in dict1.keys() | dict2.keys()}
 
 
-    def most_frequent(self, counter, total_top_k_letters):
-        return {letter: counter.estimated_events(occur / self.rep) for letter, occur in \
+    def most_frequent(self, total_top_k_letters):
+        return {letter: occur for letter, occur in \
             sorted(total_top_k_letters.items(), key=lambda x: x[1], reverse=True)[:self.k]}
 
 
@@ -45,9 +45,10 @@ class Test():
             total_time += time.time() - tic
 
             if not exact:
-                total_events += counter.counter_value
-                total_estimated_events += counter.estimated_events()
-                total_top_k_letters = self.merge_and_add_dicts(total_top_k_letters, counter.letter_occur)
+                counter.estimate_events()
+                total_events += sum(counter.letter_occur.values())
+                total_estimated_events += sum(counter.estimated_letter_occur.values())
+                total_top_k_letters = self.merge_and_add_dicts(total_top_k_letters, counter.estimated_letter_occur)
 
         avg_time = total_time / self.rep
 
@@ -56,7 +57,7 @@ class Test():
         if not exact:
             avg_events = total_events / self.rep
             estimated_avg_events = total_estimated_events / self.rep
-            common_top_k_letters = self.most_frequent(counter, total_top_k_letters)
+            common_top_k_letters = self.most_frequent(total_top_k_letters)
 
             print(f"\t{'Average ' if self.rep != 1 else ''}Counted Events: {avg_events:.2f}")
             print(f"\t{'Average ' if self.rep != 1 else ''}Estimated Number of Events: {estimated_avg_events:.2f}")

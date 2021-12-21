@@ -24,7 +24,6 @@ class FixedProbCounter():
     '''
     def count(self):
         self.letter_occur = defaultdict(int)
-        self.counter_value = 0
 
         file = open_file(self.fname, 'r')
 
@@ -35,14 +34,11 @@ class FixedProbCounter():
                 # counts event with a fixed probability
                 if random() <= self.fixed_probability:
                     self.letter_occur[letter] += 1
-                    self.counter_value += 1
 
         file.close
 
 
-    def estimated_events(self, num=0):
-        if not num:
-            num = self.counter_value
-        return int(num * (1 / self.fixed_probability))
-    
-
+    def estimate_events(self):
+        self.estimated_letter_occur = {}
+        for letter, occur in self.letter_occur.items():
+            self.estimated_letter_occur[letter] = int(occur * (1 / self.fixed_probability)) 
