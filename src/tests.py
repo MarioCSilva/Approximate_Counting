@@ -3,7 +3,7 @@ from exact_counter import ExactCounter
 from fixed_prob_counter import FixedProbCounter
 import time
 from math import sqrt
-
+from tabulate import tabulate
 
 class Test():
     def __init__(self, fname="datasets/it_book.txt", rep=1000, k=10):
@@ -32,20 +32,20 @@ class Test():
             sorted(total_top_k_letters.items(), key=lambda x: x[1], reverse=True)[:self.k]}
 
 
-    def mean(self, letter_occur):
+    def calc_mean(self, letter_occur):
         return sum(letter_occur.values()) / len(letter_occur)
 
 
-    def variance(self, letter_occur, mean):
-        deviations = [(x - mean) ** 2 for x in letter_occur.values()]
-        return sum(deviations) / len(letter_occur)
+    def calc_variance(self, letter_occur, mean):
+        dvts = [(x - mean) ** 2 for x in letter_occur.values()]
+        return sum(dvts) / len(letter_occur)
 
 
     def get_stats(self, counter, exact_counter=False):
         print(f"{counter}\n")
 
-        total_time, total_means, total_events, total_estimated_events,\
-            total_std_deviation, total_variance, total_min_events, total_max_events =\
+        total_time, total_means, total_countings, total_estimated_events,\
+            total_std_dvt, total_variance, total_min_events, total_max_events =\
                 0, 0, 0, 0, 0, 0, 0, 0
         total_top_k_letters = {}
 
@@ -56,48 +56,74 @@ class Test():
 
             if not exact_counter:
                 counter.estimate_events()
-                total_events += sum(counter.letter_occur.values())
+                total_countings += sum(counter.letter_occur.values())
                 total_estimated_events += sum(counter.estimated_letter_occur.values())
                 total_min_events += min(counter.estimated_letter_occur.values())
                 total_max_events += max(counter.estimated_letter_occur.values())
 
-                mean = self.mean(counter.estimated_letter_occur)
-                variance = self.variance(counter.estimated_letter_occur, mean)
-                std_deviation = sqrt(variance)
+                mean = self.calc_mean(counter.estimated_letter_occur)
+                variance = self.calc_variance(counter.estimated_letter_occur, mean)
+                std_dvt = sqrt(variance)
 
                 total_means += mean
                 total_variance += variance
-                total_std_deviation += std_deviation
+                total_std_dvt += std_dvt
                 total_top_k_letters = self.merge_and_add_dicts(total_top_k_letters, counter.estimated_letter_occur)
 
         avg_time = total_time / self.rep
+        data = [["Total Countings"], ["Counting Time (s)"], ["Total Events"], ["Mean"], ["Minimum"], ["Maximum"], ["Variance"], ["Standard Deviation"]]
+        headers = ["Measure", "Value"]
 
         if exact_counter:
             self.exact_top_k_letters = counter.top_k_letters(self.k)
             self.k = len(self.exact_top_k_letters)
             self.alphabet_size = len(counter.letter_occur)
+            self.total_events = total_countings = sum(counter.letter_occur.values())
+            self.mean = mean = self.calc_mean(counter.letter_occur)
+            self.min_events = min_events = min(counter.letter_occur.values())
+            self.max_events = max_events = max(counter.letter_occur.values())
+            self.variance = variance = self.calc_variance(counter.letter_occur, mean)
+            self.std_dvt = std_dvt = sqrt(variance)
+            data[2].append(round(self.total_events, 2))
+            data[3].append(round(self.mean, 2))
+            data[4].append(round(self.min_events, 2))
+            data[5].append(round(self.max_events, 2))
+            data[6].append(round(self.variance, 2))
+            data[7].append(round(self.std_dvt, 2))
         else:
-            mean = total_means / self.rep
-            min_events = total_min_events / self.rep
-            max_events = total_max_events / self.rep
-            mean = total_means / self.rep
-            variance = total_variance / self.rep
-            std_deviation = total_std_deviation / self.rep
-            events = total_events / self.rep
-            estimated_events = total_estimated_events / self.rep
+            headers.extend(["Absolute Error", "Relative Error (%)"])
+            total_countings = round(total_countings / self.rep, 2)
+            total_events = round(total_estimated_events / self.rep, 2)
+            mean = round(total_means / self.rep, 2)
+            min_events = round(total_min_events / self.rep, 2)
+            max_events = round(total_max_events / self.rep, 2)
+            variance = round(total_variance / self.rep, 2)
+            std_dvt = round(total_std_dvt / self.rep, 2)
             common_top_k_letters = self.most_frequent(total_top_k_letters)
 
-            print(f"\tTotal Effected Countings for {self.rep} Repetition{'s' if self.rep != 1 else ''}: {events:.2f}")
-            print(f"\tAverages Values for {self.rep} repetition{'s' if self.rep != 1 else ''}:")
-            print(f"\t\tCounting Time: {avg_time:.2f} seconds")
-            print(f"\t\tTotal Number of Events: {estimated_events:.2f}")
-            print(f"\t\tMean: {mean:.2f}")
-            print(f"\t\tMinimum: {min_events:.2f}")
-            print(f"\t\tMaximum: {max_events:.2f}")
-            print(f"\t\tVariance: {variance:.2f}")
-            print(f"\t\tStandard Deviation: {std_deviation:.2f}")
-            
-            print(f"\t\t{'Most Frequent ' if self.rep != 1 else ''}Top {self.k} Letters:")
+            data[2].extend([total_events, round(abs(self.total_events - total_events), 2),
+                round(abs(self.total_events - total_events) / self.total_events * 100, 2)])
+            data[3].extend([mean, round(abs(self.mean - mean), 2),
+                round(abs(self.mean - mean) / self.mean * 100, 2)])
+            data[4].extend([min_events, round(abs(self.min_events - min_events), 2),
+                round(abs(self.min_events - min_events) / self.min_events * 100, 2)])
+            data[5].extend([max_events, round(abs(self.max_events - max_events), 2),
+                round(abs(self.max_events - max_events), 2) / round(self.max_events * 100, 2)])
+            data[6].extend([variance, round(abs(self.variance - variance), 2),
+                round(abs(self.variance - variance) / self.variance * 100, 2)])
+            data[7].extend([std_dvt, round(abs(self.std_dvt - std_dvt), 2),
+                round(abs(self.std_dvt - std_dvt) / self.std_dvt * 100, 2)])
+        
+        data[0].append(total_countings)
+        data[1].append(round(avg_time, 2))
+
+        print(f"Averages Values for {self.rep} repetition{'s' if self.rep != 1 else ''}:\n")
+        print(tabulate(data, headers=headers))
+
+        print(f"\nTop {self.k} Most Frequent Letters:")
+        if exact_counter:
+            [print(f"\tEvents of the Letter '{letter}': {occur}") for letter, occur in self.exact_top_k_letters.items()]
+        else:
             relative_precision, right_position_letters = 0, 0
             exact_top_k_letters = list(self.exact_top_k_letters.keys())
 
@@ -106,7 +132,7 @@ class Test():
                 if letter == exact_top_k_letters[i]:
                     right_position_letters += 1
                     relative_precision += right_position_letters / (i + 1)
-                print(f"\t\t\tEvents of the Letter '{letter}': {occur}")
+                print(f"\tEvents of the Letter '{letter}': {occur}")
             
             avg_relative_precision = relative_precision / self.k * 100
             TP = len([letter for letter in common_top_k_letters.keys() if letter in self.exact_top_k_letters.keys()])
@@ -116,31 +142,8 @@ class Test():
             accuracy = (TP + TN) / self.alphabet_size * 100
 
             # recall not appropriate since we are evaluation a top n frequent letters
-            print(f"\t\t\tPrecision: {precision:.2f}%")
-            print(f"\t\t\tAccuracy: {accuracy:.2f}%")
-            print(f"\t\t\tAverage Precision (relative order): {avg_relative_precision:.2f}%")
-
-            # TODO:
-            # compare with exact counter: in terms of absolute and relative errors (lowest value, highest value, average value)
-
-            print("\n")
-            return
-
-        mean = self.mean(counter.letter_occur)
-        variance = self.variance(counter.letter_occur, mean)
-        std_deviation = sqrt(variance)
-
-        print(f"\tTotal Effected Countings for {self.rep} Repetition{'s' if self.rep != 1 else ''}:\
-            {sum(counter.letter_occur.values())}")
-        print(f"\tAverage Values for {self.rep} repetition{'s' if self.rep != 1 else ''}:")
-        print(f"\t\tCounting Time: {avg_time:.2f} seconds")
-        print(f"\t\tTotal Number of Events: {sum(counter.letter_occur.values())}")
-        print(f"\t\tMean: {mean}")
-        print(f"\t\tMinimum: {min(counter.letter_occur.values())}")
-        print(f"\t\tMaximum: {max(counter.letter_occur.values())}")
-        print(f"\t\tVariance: {variance:.2f}")
-        print(f"\t\tStandard Deviation: {std_deviation:.2f}")
-        print(f"\t\tTop {self.k} Letters:")
-        [print(f"\t\t\tEvents of the Letter '{letter}': {occur}") for letter, occur in self.exact_top_k_letters.items()]
+            print(f"\n\tPrecision: {precision:.2f} %")
+            print(f"\tAccuracy: {accuracy:.2f} %")
+            print(f"\tAverage Precision (relative order): {avg_relative_precision:.2f} %")
 
         print("\n")
