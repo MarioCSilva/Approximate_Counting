@@ -18,7 +18,6 @@ class ExactCounter():
     '''
     def count(self):
         self.letter_occur = defaultdict(int)
-        self.counter_value = 0
 
         file = open_file(self.fname, 'r')
 
@@ -27,7 +26,6 @@ class ExactCounter():
             # removes all non-alphabetical chars
             for letter in re.findall(r'[A-Z]', chunk):
                 self.letter_occur[letter] += 1
-                self.counter_value += 1
         
         file.close
 
