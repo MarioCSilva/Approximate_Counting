@@ -45,7 +45,8 @@ class Test():
         print(f"{counter}\n")
 
         total_time, total_means, total_events, total_estimated_events,\
-            total_std_deviation, total_variance = 0, 0, 0, 0, 0, 0
+            total_std_deviation, total_variance, total_min_events, total_max_events =\
+                0, 0, 0, 0, 0, 0, 0, 0
         total_top_k_letters = {}
 
         for _ in range(self.rep):
@@ -57,6 +58,8 @@ class Test():
                 counter.estimate_events()
                 total_events += sum(counter.letter_occur.values())
                 total_estimated_events += sum(counter.estimated_letter_occur.values())
+                total_min_events += min(counter.estimated_letter_occur.values())
+                total_max_events += max(counter.estimated_letter_occur.values())
 
                 mean = self.mean(counter.estimated_letter_occur)
                 variance = self.variance(counter.estimated_letter_occur, mean)
@@ -75,17 +78,22 @@ class Test():
             self.alphabet_size = len(counter.letter_occur)
         else:
             mean = total_means / self.rep
+            min_events = total_min_events / self.rep
+            max_events = total_max_events / self.rep
+            mean = total_means / self.rep
             variance = total_variance / self.rep
             std_deviation = total_std_deviation / self.rep
             events = total_events / self.rep
             estimated_events = total_estimated_events / self.rep
             common_top_k_letters = self.most_frequent(total_top_k_letters)
 
-            print(f"\tTotal Counted Events for all Repetitions: {events:.2f}")
+            print(f"\tTotal Effected Countings for {self.rep} Repetition{'s' if self.rep != 1 else ''}: {events:.2f}")
             print(f"\tAverages Values for {self.rep} repetition{'s' if self.rep != 1 else ''}:")
             print(f"\t\tCounting Time: {avg_time:.2f} seconds")
-            print(f"\t\tEstimated Number of Events: {estimated_events:.2f}")
-            print(f"\t\tMean Estimated Number of Events: {mean:.2f}")
+            print(f"\t\tTotal Number of Events: {estimated_events:.2f}")
+            print(f"\t\tMean: {mean:.2f}")
+            print(f"\t\tMinimum: {min_events:.2f}")
+            print(f"\t\tMaximum: {max_events:.2f}")
             print(f"\t\tVariance: {variance:.2f}")
             print(f"\t\tStandard Deviation: {std_deviation:.2f}")
             
@@ -122,11 +130,14 @@ class Test():
         variance = self.variance(counter.letter_occur, mean)
         std_deviation = sqrt(variance)
 
-        print(f"\tTotal Counted Events for all Repetitions: {sum(counter.letter_occur.values())}")
-        print(f"\tAverages Values for {self.rep} repetition{'s' if self.rep != 1 else ''}:")
+        print(f"\tTotal Effected Countings for {self.rep} Repetition{'s' if self.rep != 1 else ''}:\
+            {sum(counter.letter_occur.values())}")
+        print(f"\tAverage Values for {self.rep} repetition{'s' if self.rep != 1 else ''}:")
         print(f"\t\tCounting Time: {avg_time:.2f} seconds")
-        print(f"\t\tNumber of Events: {sum(counter.letter_occur.values())}")
-        print(f"\t\tMean Number of Events: {mean}")
+        print(f"\t\tTotal Number of Events: {sum(counter.letter_occur.values())}")
+        print(f"\t\tMean: {mean}")
+        print(f"\t\tMinimum: {min(counter.letter_occur.values())}")
+        print(f"\t\tMaximum: {max(counter.letter_occur.values())}")
         print(f"\t\tVariance: {variance:.2f}")
         print(f"\t\tStandard Deviation: {std_deviation:.2f}")
         print(f"\t\tTop {self.k} Letters:")
