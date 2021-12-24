@@ -72,6 +72,7 @@ class Test():
         if exact_counter:
             self.exact_top_k_letters = counter.top_k_letters(self.k)
             self.k = len(self.exact_top_k_letters)
+            self.alphabet_size = len(counter.letter_occur)
         else:
             mean = total_means / self.rep
             variance = total_variance / self.rep
@@ -89,15 +90,30 @@ class Test():
             print(f"\t\tStandard Deviation: {std_deviation:.2f}")
             
             print(f"\t\t{'Most Frequent ' if self.rep != 1 else ''}Top {self.k} Letters:")
-            [print(f"\t\t\tEvents of the Letter '{letter}': {occur}") for letter, occur in common_top_k_letters.items()]
+            relative_precision, right_position_letters = 0, 0
+            exact_top_k_letters = list(self.exact_top_k_letters.keys())
+
+            for i, letter_occur in enumerate(common_top_k_letters.items()):
+                letter, occur = letter_occur
+                if letter == exact_top_k_letters[i]:
+                    right_position_letters += 1
+                    relative_precision += right_position_letters / (i + 1)
+                print(f"\t\t\tEvents of the Letter '{letter}': {occur}")
+            
+            avg_relative_precision = relative_precision / self.k * 100
             TP = len([letter for letter in common_top_k_letters.keys() if letter in self.exact_top_k_letters.keys()])
-            accuracy = TP / self.k * 100
+            FP = self.k - TP
+            TN = self.alphabet_size - self.k - FP
+            precision = TP / self.k * 100
+            accuracy = (TP + TN) / self.alphabet_size * 100
+
+            # recall not appropriate since we are evaluation a top n frequent letters
+            print(f"\t\t\tPrecision: {precision:.2f}%")
             print(f"\t\t\tAccuracy: {accuracy:.2f}%")
+            print(f"\t\t\tAverage Precision (relative order): {avg_relative_precision:.2f}%")
 
             # TODO:
-            # Analyse relative order as well
             # compare with exact counter: in terms of absolute and relative errors (lowest value, highest value, average value)
-            # For paper only I think: check most frequent letters in the same book but in different languages.
 
             print("\n")
             return
