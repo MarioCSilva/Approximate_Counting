@@ -69,7 +69,10 @@ class Test():
 
         avg_time = total_time / self.rep
 
-        if not exact_counter:
+        if exact_counter:
+            self.exact_top_k_letters = counter.top_k_letters(self.k)
+            self.k = len(self.exact_top_k_letters)
+        else:
             mean = total_means / self.rep
             variance = total_variance / self.rep
             std_deviation = total_std_deviation / self.rep
@@ -87,7 +90,15 @@ class Test():
             
             print(f"\t\t{'Most Frequent ' if self.rep != 1 else ''}Top {self.k} Letters:")
             [print(f"\t\t\tEvents of the Letter '{letter}': {occur}") for letter, occur in common_top_k_letters.items()]
-            
+            TP = len([letter for letter in common_top_k_letters.keys() if letter in self.exact_top_k_letters.keys()])
+            accuracy = TP / self.k * 100
+            print(f"\t\t\tAccuracy: {accuracy:.2f}%")
+
+            # TODO:
+            # Analyse relative order as well
+            # compare with exact counter: in terms of absolute and relative errors (lowest value, highest value, average value)
+            # For paper only I think: check most frequent letters in the same book but in different languages.
+
             print("\n")
             return
 
@@ -103,6 +114,6 @@ class Test():
         print(f"\t\tVariance: {variance:.2f}")
         print(f"\t\tStandard Deviation: {std_deviation:.2f}")
         print(f"\t\tTop {self.k} Letters:")
-        [print(f"\t\t\tEvents of the Letter '{letter}': {occur}") for letter, occur in counter.top_k_letters(self.k).items()]
+        [print(f"\t\t\tEvents of the Letter '{letter}': {occur}") for letter, occur in self.exact_top_k_letters.items()]
 
         print("\n")
