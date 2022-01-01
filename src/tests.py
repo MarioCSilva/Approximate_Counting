@@ -70,8 +70,8 @@ class Test():
                 total_std_dvt += std_dvt
                 total_top_k_letters = self.merge_and_add_dicts(total_top_k_letters, counter.estimated_letter_occur)
 
-        avg_time = total_time / self.rep
-        data = [["Total Countings"], ["Counting Time (s)"], ["Total Events"], ["Mean"], ["Minimum"], ["Maximum"], ["Variance"], ["Standard Deviation"]]
+        avg_time = round(total_time / self.rep, 3)
+        data = [["Counting Time (s)", avg_time], ["Events"], ["Mean"], ["Minimum"], ["Maximum"], ["Variance"], ["Standard Deviation"]]
         headers = ["Measure", "Value"]
 
         if exact_counter:
@@ -84,12 +84,12 @@ class Test():
             self.max_events = max_events = max(counter.letter_occur.values())
             self.variance = variance = self.calc_variance(counter.letter_occur, mean)
             self.std_dvt = std_dvt = sqrt(variance)
-            data[2].append(round(self.total_events, 2))
-            data[3].append(round(self.mean, 2))
-            data[4].append(round(self.min_events, 2))
-            data[5].append(round(self.max_events, 2))
-            data[6].append(round(self.variance, 2))
-            data[7].append(round(self.std_dvt, 2))
+            data[1].append(round(self.total_events, 2))
+            data[2].append(round(self.mean, 2))
+            data[3].append(round(self.min_events, 2))
+            data[4].append(round(self.max_events, 2))
+            data[5].append(round(self.variance, 2))
+            data[6].append(round(self.std_dvt, 2))
         else:
             headers.extend(["Absolute Error", "Relative Error (%)"])
             total_countings = round(total_countings / self.rep, 2)
@@ -101,23 +101,23 @@ class Test():
             std_dvt = round(total_std_dvt / self.rep, 2)
             common_top_k_letters = self.most_frequent(total_top_k_letters)
 
-            data[2].extend([total_events, round(abs(self.total_events - total_events), 2),
+            data[1].extend([total_events, round(abs(self.total_events - total_events), 2),
                 round(abs(self.total_events - total_events) / self.total_events * 100, 2)])
-            data[3].extend([mean, round(abs(self.mean - mean), 2),
+            data[2].extend([mean, round(abs(self.mean - mean), 2),
                 round(abs(self.mean - mean) / self.mean * 100, 2)])
-            data[4].extend([min_events, round(abs(self.min_events - min_events), 2),
+            data[3].extend([min_events, round(abs(self.min_events - min_events), 2),
                 round(abs(self.min_events - min_events) / self.min_events * 100, 2)])
-            data[5].extend([max_events, round(abs(self.max_events - max_events), 2),
+            data[4].extend([max_events, round(abs(self.max_events - max_events), 2),
                 round(abs(self.max_events - max_events), 2) / round(self.max_events * 100, 2)])
-            data[6].extend([variance, round(abs(self.variance - variance), 2),
+            data[5].extend([variance, round(abs(self.variance - variance), 2),
                 round(abs(self.variance - variance) / self.variance * 100, 2)])
-            data[7].extend([std_dvt, round(abs(self.std_dvt - std_dvt), 2),
+            data[6].extend([std_dvt, round(abs(self.std_dvt - std_dvt), 2),
                 round(abs(self.std_dvt - std_dvt) / self.std_dvt * 100, 2)])
         
-        data[0].append(total_countings)
-        data[1].append(round(avg_time, 2))
 
-        print(f"Averages Values for {self.rep} repetition{'s' if self.rep != 1 else ''}:\n")
+        print(f"Results for {self.rep} repetition{'s' if self.rep != 1 else ''}:")
+        print(f"Total Elapsed Time: {round(total_time, 3)} s\nTotal Events Counted: {total_countings}")
+        print("\nAverage Values for a Repetition:")
         print(tabulate(data, headers=headers))
 
         print(f"\nTop {self.k} Most Frequent Letters:")
