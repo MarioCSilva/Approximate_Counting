@@ -158,6 +158,8 @@ class Test():
             
             plt.plot(plot_data[0], plot_data[1], label="Total Events Relative Error")
             plt.plot(plot_data[0], plot_data[2], label="Standard Deviation Relative Error")
+            plt.ylabel("Relative Error (%)")
+            plt.xlabel("Repetition")
             plt.title(counter)
             plt.legend()
             plt.show()
