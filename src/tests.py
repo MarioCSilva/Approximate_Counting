@@ -4,6 +4,8 @@ from fixed_prob_counter import FixedProbCounter
 import time
 from math import sqrt
 from tabulate import tabulate
+import matplotlib.pyplot as plt
+
 
 class Test():
     def __init__(self, fname="datasets/it_book.txt", rep=1000, k=10):
@@ -48,11 +50,13 @@ class Test():
             total_std_dvt, total_variance, total_min_events, total_max_events =\
                 0, 0, 0, 0, 0, 0, 0, 0
         total_top_k_letters = {}
+        plot_data = [[], [], []]
 
-        for _ in range(self.rep):
+        for i in range(self.rep):
             tic = time.time()
             counter.count()
             total_time += time.time() - tic
+
 
             if not exact_counter:
                 counter.estimate_events()
@@ -70,10 +74,16 @@ class Test():
                 total_std_dvt += std_dvt
                 total_top_k_letters = self.merge_and_add_dicts(total_top_k_letters, counter.estimated_letter_occur)
 
+                rep = i + 1
+                plot_data[0].append(rep)
+                plot_data[1].append(abs(self.total_events - (total_estimated_events / rep)) / self.total_events * 100)
+                plot_data[2].append(abs(self.std_dvt - (total_std_dvt / rep)) / self.std_dvt * 100)
+
+
         avg_time = round(total_time / self.rep, 3)
         data = [["Counting Time (s)", avg_time], ["Events"], ["Mean"], ["Minimum"], ["Maximum"], ["Variance"], ["Standard Deviation"]]
         headers = ["Measure", "Value"]
-
+        
         if exact_counter:
             self.exact_top_k_letters = counter.top_k_letters(self.k)
             self.k = len(self.exact_top_k_letters)
@@ -145,5 +155,11 @@ class Test():
             print(f"\n\tPrecision: {precision:.2f} %")
             print(f"\tAccuracy: {accuracy:.2f} %")
             print(f"\tAverage Precision (relative order): {avg_relative_precision:.2f} %")
+            
+            plt.plot(plot_data[0], plot_data[1], label="Total Events Relative Error")
+            plt.plot(plot_data[0], plot_data[2], label="Standard Deviation Relative Error")
+            plt.title(counter)
+            plt.legend()
+            plt.show()
 
         print("\n")
