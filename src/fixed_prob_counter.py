@@ -30,10 +30,11 @@ class FixedProbCounter():
         # reads chunk by chunk
         while chunk := file.read(1024):
             # removes all non-alphabetical chars
-            for letter in re.findall(r'[a-zA-Z]', chunk):
-                # counts event with a fixed probability
-                if random() <= self.fixed_probability:
-                    self.letter_occur[letter.upper()] += 1
+            for letter in chunk:
+                if letter.isalpha():
+                    # counts event with a fixed probability
+                    if random() <= self.fixed_probability:
+                        self.letter_occur[letter.upper()] += 1
 
         file.close
 

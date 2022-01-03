@@ -23,10 +23,9 @@ class ExactCounter():
 
         # reads chunk by chunk
         while chunk := file.read(1024):
-            # removes all non-alphabetical chars
-            for letter in re.findall(r'[a-zA-Z]', chunk):
-                self.letter_occur[letter.upper()] += 1
-        
+            for letter in chunk:
+                if letter.isalpha():
+                    self.letter_occur[letter.upper()] += 1
         file.close
 
 

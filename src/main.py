@@ -24,7 +24,7 @@ class Main:
             usage=self.usage
         )
         arg_parser.add_argument('-help', action='store_true')
-        arg_parser.add_argument('-file_name', nargs=1, type=str, default=['../datasets/de_bible.txt'])
+        arg_parser.add_argument('-file_name', nargs=1, type=str, default=['../datasets/en_bible.txt'])
         arg_parser.add_argument('-repetitions', nargs=1, type=int, default=[100])
         arg_parser.add_argument('-k', nargs=1, type=int, default=[10])
 
