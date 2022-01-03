@@ -31,7 +31,8 @@ class DecreasingProbCounter():
         # reads chunk by chunk
         while chunk := file.read(1024):
             # removes all non-alphabetical chars
-            for letter in re.findall(r'[A-Z]', chunk):
+            for letter in re.findall(r'[a-zA-Z]', chunk):
+                letter = letter.upper()
                 # counts event with a decreasing probability
                 if random() <= letter_probabilities[letter]:
                     self.letter_occur[letter] += 1

@@ -12,7 +12,7 @@ class Main:
     def usage(self):
         print("Usage: python3 main.py\
             \n\t-f <File Name for Counting Letters: str>\
-            \n\t-k <Top k Most Occurrent Letters: int>\
+            \n\t-k <Top 'k' Most Occurrent Letters: int>\
             \n\t-r <Repetitions for Testing: int>")
 
         sys.exit()
@@ -24,7 +24,7 @@ class Main:
             usage=self.usage
         )
         arg_parser.add_argument('-help', action='store_true')
-        arg_parser.add_argument('-file_name', nargs=1, type=str, default=['../datasets/it_book.txt'])
+        arg_parser.add_argument('-file_name', nargs=1, type=str, default=['../datasets/de_bible.txt'])
         arg_parser.add_argument('-repetitions', nargs=1, type=int, default=[100])
         arg_parser.add_argument('-k', nargs=1, type=int, default=[10])
 
